@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>HelloMonad💜</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --purple1: #4b0082;
+      --purple2: #800080;
+      --accent: #ffccff;
+    }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      background: linear-gradient(-45deg, var(--purple1), var(--purple2), #6a0dad, #9932cc);
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header {
+      text-align: center;
+      padding: 16px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+    header h2 {
+      margin: 20px 0 0;   /* 🔹 more spacing between HelloMonad and subtitle */
+      font-size: 1.4rem;  /* 🔹 reduced size for subtitle */
+      font-weight: 500;
+    }
+    header p {
+      margin: 6px 0 0;
+      color: #f0e7ffcc;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .stage {
+      width: 360px;
+      max-width: 95vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+    }
+
+    /* Door setup */
+    .door-wrap {
+      width: 220px;
+      height: 320px;
+      perspective: 1000px;
+      position: relative;
+      cursor: pointer;
+    }
+    .door {
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        #8b5a2b 0px, #7a441a 40px,
+        #8b5a2b 40px, #7a441a 80px
+      );
+      border: 6px solid #4a2e13;
+      border-radius: 6px;
+      transform-origin: left;
+      transition: transform 900ms cubic-bezier(.15,.9,.2,1);
+      z-index: 2;
+      box-shadow: inset -6px 0 12px rgba(0,0,0,0.3), 0 12px 25px rgba(0,0,0,0.5);
+    }
+    .door::after {
+      content: "";
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ccc, #555);
+      box-shadow: inset 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    .door.open { transform: rotateY(-100deg); }
+    .door.shake { animation: doorShake 420ms; }
+    @keyframes doorShake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-18px); }
+      40% { transform: translateX(18px); }
+      60% { transform: translateX(-10px); }
+      80% { transform: translateX(10px); }
+      100% { transform: translateX(0); }
+    }
+
+    /* Kitty */
+    .kitty {
+      position: absolute;
+      left: 50%;
+      bottom: 12px;
+      transform: translate(-50%, 40px);
+      width: 170px;
+      opacity: 0;
+      transition: all 700ms cubic-bezier(.2,.9,.2,1);
+      z-index: 1;
+    }
+    .kitty.show { transform: translate(-50%, 0); opacity: 1; }
+
+    /* Bubble above kitty */
+    .bubble {
+      position: absolute;
+      bottom: 340px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.8);
+      background: #fff;
+      color: #000;
+      padding: 10px 16px;
+      border-radius: 18px;
+      font-size: 16px;
+      text-align: center;
+      min-width: 100px;
+      max-width: 220px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+      opacity: 0;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .bubble::after {
+      content: "";
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 12px 12px 0;
+      border-style: solid;
+      border-color: #fff transparent transparent transparent;
+    }
+    .bubble.show { opacity: 1; transform: translateX(-50%) scale(1); }
+
+    /* Input */
+    .input-row {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+    .input-row input {
+      width: 230px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    footer {
+      padding: 10px;
+      font-size: 13px;
+      text-align: center;
+      color: #f3e0ffcc;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      width: 12px;
+      height: 14px;
+      z-index: 9999;
+      top: -20px;
+      opacity: 0.95;
+      pointer-events: none;
+      border-radius: 2px;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>HelloMonad💜</h1>
+    <h2>Monad Greeting Kitty</h2>
+    <p>Type a Monad greeting and click the door to meet the kitty!</p>
+  </header>
+
+  <main class="main">
+    <section class="stage">
+      <div class="door-wrap" id="doorWrap">
+        <div id="door" class="door"></div>
+        <img id="kitty" class="kitty" alt="Monad kitty" src="monad-kitty.jpg.jpg" />
+        <div id="bubble" class="bubble"></div>
+      </div>
+
+      <div class="input-row">
+        <input id="userInput" placeholder="Enter: 💜 gmonad gm gn gnad" />
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>Built with 💜 on <a href="https://monad.xyz" target="_blank">Monad</a></div>
+  </footer>
+
+<script>
+/* Greeting sets */
+const morningGreetings = [
+  "gm ☀️ rise and shine",
+  "gmonad 🌅",
+  "gm frens 💜",
+  "💜 gm monad",
+  "gm gm gm 🟣",
+  "good morning monad ☕"
+];
+const nightGreetings = [
+  "gn 🌌 sleep tight",
+  "gnad 🌙",
+  "gn monad family 💜",
+  "💜 sweet dreams monad",
+  "gn gn gn 💤",
+  "good night monad ✨"
+];
+
+/* Elements */
+const door = document.getElementById("door");
+const kitty = document.getElementById("kitty");
+const bubble = document.getElementById("bubble");
+const input = document.getElementById("userInput");
+const doorWrap = document.getElementById("doorWrap");
+
+/* Sounds */
+const audioCtx = window.AudioContext ? new AudioContext() : null;
+function playChime(){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(440, now);
+  osc.frequency.exponentialRampToValueAtTime(880, now+0.18);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.35, now+0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now+0.6);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(now); osc.stop(now+0.7);
+}
+function playError(){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = "square";
+  osc.frequency.setValueAtTime(180, now);
+  osc.frequency.exponentialRampToValueAtTime(90, now+0.12);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.45, now+0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now+0.35);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(now); osc.stop(now+0.4);
+}
+
+/* Confetti */
+function explodeConfetti(count=50){
+  const colors = ["#FFD700","#FF69B4","#ADFF2F","#00FFFF","#FF4500","#FFFFFF","#FF1493","#7FFF00","#DA70D6","#9400D3"];
+  for(let i=0;i<count;i++){
+    const el=document.createElement("div");
+    el.className="confetti";
+    el.style.left=(Math.random()*100)+"vw";
+    el.style.background=colors[Math.floor(Math.random()*colors.length)];
+    const size=6+Math.random()*10;
+    el.style.width=size+"px"; el.style.height=size+"px";
+    const dur=1000+Math.random()*1500;
+    el.style.animationDuration=dur+"ms";
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), dur+200);
+  }
+}
+
+/* Shake door */
+function shakeDoor(){
+  door.classList.remove("shake");
+  void door.offsetWidth;
+  door.classList.add("shake");
+  playError();
+}
+
+/* Open door */
+function openDoor(){
+  const txt=input.value.trim().toLowerCase();
+  if(!txt){
+    bubble.textContent="❌ Enter something!";
+    bubble.classList.add("show");
+    shakeDoor();
+    return;
+  }
+
+  let pool=null;
+  if(txt.includes("gm") || txt.includes("gmonad") || txt.includes("💜")){
+    pool=morningGreetings;
+  } else if(txt.includes("gn") || txt.includes("gnad")){
+    pool=nightGreetings;
+  }
+
+  if(!pool){
+    bubble.textContent="❌ Not Monadish!";
+    bubble.classList.add("show");
+    shakeDoor();
+    return;
+  }
+
+  const greeting = pool[Math.floor(Math.random()*pool.length)];
+
+  door.classList.add("open");
+  setTimeout(()=>{
+    kitty.classList.add("show");
+    bubble.textContent=greeting;
+    bubble.classList.add("show");
+    playChime();
+    explodeConfetti();
+  },700);
+
+  setTimeout(()=>{
+    door.classList.remove("open");
+    kitty.classList.remove("show");
+    bubble.classList.remove("show");
+    input.value="";
+  }, 3500);
+}
+
+/* Only click opens */
+doorWrap.addEventListener("click", openDoor);
+</script>
+</body>
+</html>
