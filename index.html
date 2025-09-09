@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://unpkg.com/@farcaster/mini-apps-sdk/dist/browser.min.js"></script>
   <meta charset="utf-8" />
   <title>HelloMonad💜</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -344,5 +345,15 @@ function openDoor(){
 /* Only click opens */
 doorWrap.addEventListener("click", openDoor);
 </script>
+<script>
+  window.addEventListener("load", () => {
+    if (window.farcaster) {
+      farcaster.actions.ready();
+      console.log("✅ Farcaster Mini App is ready!");
+    }
+  });
+</script>
+
 </body>
 </html>
+
