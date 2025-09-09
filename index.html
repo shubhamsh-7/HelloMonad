@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://unpkg.com/@farcaster/mini-apps-sdk/dist/browser.min.js"></script>
   <meta charset="utf-8" />
   <title>HelloMonad💜</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-
-  <!-- Farcaster Mini App SDK -->
-  <script src="https://unpkg.com/@farcaster/mini-apps-sdk/dist/browser.min.js"></script>
-
   <style>
     :root {
       --purple1: #4b0082;
@@ -32,16 +29,49 @@
       100% { background-position: 0% 50%; }
     }
 
-    header { text-align: center; padding: 16px; }
-    header h1 { margin: 0; font-size: 2.5rem; }
-    header h2 { margin: 20px 0 0; font-size: 1.4rem; font-weight: 500; }
-    header p { margin: 6px 0 0; color: #f0e7ffcc; }
+    header {
+      text-align: center;
+      padding: 16px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+    header h2 {
+      margin: 20px 0 0;
+      font-size: 1.4rem;
+      font-weight: 500;
+    }
+    header p {
+      margin: 6px 0 0;
+      color: #f0e7ffcc;
+    }
 
-    .main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px; }
-    .stage { width: 360px; max-width: 95vw; display: flex; flex-direction: column; align-items: center; gap: 16px; position: relative; }
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .stage {
+      width: 360px;
+      max-width: 95vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+    }
 
-    /* Door */
-    .door-wrap { width: 220px; height: 320px; perspective: 1000px; position: relative; cursor: pointer; }
+    /* Door setup */
+    .door-wrap {
+      width: 220px;
+      height: 320px;
+      perspective: 1000px;
+      position: relative;
+      cursor: pointer;
+    }
     .door {
       position: absolute; inset: 0;
       background: repeating-linear-gradient(
@@ -91,7 +121,7 @@
     }
     .kitty.show { transform: translate(-50%, 0); opacity: 1; }
 
-    /* Bubble */
+    /* Bubble above kitty */
     .bubble {
       position: absolute;
       bottom: 340px;
@@ -121,8 +151,11 @@
     }
     .bubble.show { opacity: 1; transform: translateX(-50%) scale(1); }
 
-    /* Input */
-    .input-row { display: flex; justify-content: center; width: 100%; }
+    .input-row {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
     .input-row input {
       width: 230px;
       padding: 10px;
@@ -132,12 +165,29 @@
       font-size: 15px;
     }
 
-    footer { padding: 10px; font-size: 13px; text-align: center; color: #f3e0ffcc; }
+    footer {
+      padding: 10px;
+      font-size: 13px;
+      text-align: center;
+      color: #f3e0ffcc;
+    }
     footer a { color: var(--accent); text-decoration: none; }
 
     /* Confetti */
-    .confetti { position: fixed; width: 12px; height: 14px; z-index: 9999; top: -20px; opacity: 0.95; pointer-events: none; border-radius: 2px; animation: confettiFall linear forwards; }
-    @keyframes confettiFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+    .confetti {
+      position: fixed;
+      width: 12px;
+      height: 14px;
+      z-index: 9999;
+      top: -20px;
+      opacity: 0.95;
+      pointer-events: none;
+      border-radius: 2px;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -151,10 +201,10 @@
     <section class="stage">
       <div class="door-wrap" id="doorWrap">
         <div id="door" class="door"></div>
-        <!-- ✅ fixed file name -->
         <img id="kitty" class="kitty" alt="Monad kitty" src="monad-kitty.jpg" />
         <div id="bubble" class="bubble"></div>
       </div>
+
       <div class="input-row">
         <input id="userInput" placeholder="Enter: 💜 gmonad gm gn gnad" />
       </div>
@@ -167,42 +217,144 @@
   </footer>
 
 <script>
-/* Greetings */
-const morningGreetings = ["gm ☀️ rise and shine","gmonad 🌅","gm frens 💜","💜 gm monad","gm gm gm 🟣","good morning monad ☕"];
-const nightGreetings = ["gn 🌌 sleep tight","gnad 🌙","gn monad family 💜","💜 sweet dreams monad","gn gn gn 💤","good night monad ✨"];
+/* Greeting sets */
+const morningGreetings = [
+  "gm ☀️ rise and shine",
+  "gmonad 🌅",
+  "gm frens 💜",
+  "💜 gm monad",
+  "gm gm gm 🟣",
+  "good morning monad ☕"
+];
+const nightGreetings = [
+  "gn 🌌 sleep tight",
+  "gnad 🌙",
+  "gn monad family 💜",
+  "💜 sweet dreams monad",
+  "gn gn gn 💤",
+  "good night monad ✨"
+];
 
 /* Elements */
-const door=document.getElementById("door");
-const kitty=document.getElementById("kitty");
-const bubble=document.getElementById("bubble");
-const input=document.getElementById("userInput");
-const doorWrap=document.getElementById("doorWrap");
+const door = document.getElementById("door");
+const kitty = document.getElementById("kitty");
+const bubble = document.getElementById("bubble");
+const input = document.getElementById("userInput");
+const doorWrap = document.getElementById("doorWrap");
 
-/* Audio */
-const audioCtx=window.AudioContext?new AudioContext():null;
-function playChime(){ if(!audioCtx) return; const now=audioCtx.currentTime; const osc=audioCtx.createOscillator(); const gain=audioCtx.createGain(); osc.type="sine"; osc.frequency.setValueAtTime(440,now); osc.frequency.exponentialRampToValueAtTime(880,now+0.18); gain.gain.setValueAtTime(0.0001,now); gain.gain.exponentialRampToValueAtTime(0.35,now+0.02); gain.gain.exponentialRampToValueAtTime(0.0001,now+0.6); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now+0.7);}
-function playError(){ if(!audioCtx) return; const now=audioCtx.currentTime; const osc=audioCtx.createOscillator(); const gain=audioCtx.createGain(); osc.type="square"; osc.frequency.setValueAtTime(180,now); osc.frequency.exponentialRampToValueAtTime(90,now+0.12); gain.gain.setValueAtTime(0.0001,now); gain.gain.exponentialRampToValueAtTime(0.45,now+0.01); gain.gain.exponentialRampToValueAtTime(0.0001,now+0.35); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now+0.4);}
+/* Sounds */
+const audioCtx = window.AudioContext ? new AudioContext() : null;
+function playChime(){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(440, now);
+  osc.frequency.exponentialRampToValueAtTime(880, now+0.18);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.35, now+0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now+0.6);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(now); osc.stop(now+0.7);
+}
+function playError(){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = "square";
+  osc.frequency.setValueAtTime(180, now);
+  osc.frequency.exponentialRampToValueAtTime(90, now+0.12);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.45, now+0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now+0.35);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(now); osc.stop(now+0.4);
+}
 
 /* Confetti */
-function explodeConfetti(count=50){ const colors=["#FFD700","#FF69B4","#ADFF2F","#00FFFF","#FF4500","#FFFFFF","#FF1493","#7FFF00","#DA70D6","#9400D3"]; for(let i=0;i<count;i++){ const el=document.createElement("div"); el.className="confetti"; el.style.left=(Math.random()*100)+"vw"; el.style.background=colors[Math.floor(Math.random()*colors.length)]; const size=6+Math.random()*10; el.style.width=size+"px"; el.style.height=size+"px"; const dur=1000+Math.random()*1500; el.style.animationDuration=dur+"ms"; document.body.appendChild(el); setTimeout(()=>el.remove(), dur+200);}}
+function explodeConfetti(count=50){
+  const colors = ["#FFD700","#FF69B4","#ADFF2F","#00FFFF","#FF4500","#FFFFFF","#FF1493","#7FFF00","#DA70D6","#9400D3"];
+  for(let i=0;i<count;i++){
+    const el=document.createElement("div");
+    el.className="confetti";
+    el.style.left=(Math.random()*100)+"vw";
+    el.style.background=colors[Math.floor(Math.random()*colors.length)];
+    const size=6+Math.random()*10;
+    el.style.width=size+"px"; el.style.height=size+"px";
+    const dur=1000+Math.random()*1500;
+    el.style.animationDuration=dur+"ms";
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), dur+200);
+  }
+}
 
-/* Door shake */
-function shakeDoor(){ door.classList.remove("shake"); void door.offsetWidth; door.classList.add("shake"); playError(); }
+/* Shake door */
+function shakeDoor(){
+  door.classList.remove("shake");
+  void door.offsetWidth;
+  door.classList.add("shake");
+  playError();
+}
 
-/* Door open */
-function openDoor(){ const txt=input.value.trim().toLowerCase(); if(!txt){ bubble.textContent="❌ Enter something!"; bubble.classList.add("show"); shakeDoor(); return;} let pool=null; if(txt.includes("gm")||txt.includes("gmonad")||txt.includes("💜")){ pool=morningGreetings;} else if(txt.includes("gn")||txt.includes("gnad")){ pool=nightGreetings;} if(!pool){ bubble.textContent="❌ Not Monadish!"; bubble.classList.add("show"); shakeDoor(); return;} const greeting=pool[Math.floor(Math.random()*pool.length)]; door.classList.add("open"); setTimeout(()=>{ kitty.classList.add("show"); bubble.textContent=greeting; bubble.classList.add("show"); playChime(); explodeConfetti(); },700); setTimeout(()=>{ door.classList.remove("open"); kitty.classList.remove("show"); bubble.classList.remove("show"); input.value=""; },3500);}
-doorWrap.addEventListener("click",openDoor);
+/* Open door */
+function openDoor(){
+  const txt=input.value.trim().toLowerCase();
+  if(!txt){
+    bubble.textContent="❌ Enter something!";
+    bubble.classList.add("show");
+    shakeDoor();
+    return;
+  }
+
+  let pool=null;
+  if(txt.includes("gm") || txt.includes("gmonad") || txt.includes("💜")){
+    pool=morningGreetings;
+  } else if(txt.includes("gn") || txt.includes("gnad")){
+    pool=nightGreetings;
+  }
+
+  if(!pool){
+    bubble.textContent="❌ Not Monadish!";
+    bubble.classList.add("show");
+    shakeDoor();
+    return;
+  }
+
+  const greeting = pool[Math.floor(Math.random()*pool.length)];
+
+  door.classList.add("open");
+  setTimeout(()=>{
+    kitty.classList.add("show");
+    bubble.textContent=greeting;
+    bubble.classList.add("show");
+    playChime();
+    explodeConfetti();
+  },700);
+
+  setTimeout(()=>{
+    door.classList.remove("open");
+    kitty.classList.remove("show");
+    bubble.classList.remove("show");
+    input.value="";
+  }, 3500);
+}
+
+/* Only click opens */
+doorWrap.addEventListener("click", openDoor);
 </script>
 
+<!-- ✅ Farcaster SDK Ready Fix -->
 <script>
-window.addEventListener("load", () => {
-  if (window.farcaster) {
-    farcaster.actions.ready();
-    console.log("✅ Farcaster Mini App is ready!");
-  } else {
-    console.log("⚠️ Running outside Farcaster. Open inside Warpcast.");
-  }
-});
+  window.addEventListener("load", () => {
+    if (window.farcaster && window.farcaster.actions) {
+      window.farcaster.actions.ready();
+      console.log("✅ Farcaster Mini App is ready!");
+    } else {
+      console.log("⚠️ Farcaster SDK not found. Are you running inside Warpcast?");
+    }
+  });
 </script>
 
 </body>
